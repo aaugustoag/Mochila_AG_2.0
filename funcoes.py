@@ -143,6 +143,48 @@ def mutacao (populacao, itens, tx_mutacao):
     return populacao_m
 # fim
 
+#################################################################
+
+# funcao aptidao
+def aptidao (populacao, mochila)
+  for ind in populacao:
+    if ind[0][1] > mochila:
+      ind[0][4] = ind[0][0]-mochila
+    else:
+      ind[0][4] = 0
+    ind[0][2] = ind[0][0]*(-1)
+    ind[0][3] = ind[0][1]
+
+# baneficio do individuo
+def valor (individuo)
+  return individuo[0][0]
+
+# peso do individuo
+def peso (individuo)
+  return individuo[0][1]
+
+# selecao do pareto
+def pareto (populacao,pareto)
+  ind0 = deepcopy(populacao[0])
+  for ind in populacao[1:]:
+    if (ind[0][2] < ind0[0][2]) && (ind[0][3] < ind0[0][3]):
+       
+
+
+# distancia no pareto
+def distancia (pareto)
+  maior_v = max(populacao,key=valor)
+  menor_v = min(populacao,key=valor)
+  maior_p = max(populacao,key=peso)
+  menor_p = min(populacao,key=peso)
+
+
+############################################################
+
+
+
+
+
 # fazendo competicao roleta x1
 def selecao (populacao, mochila, tam_pop):
     populacao_s = []
