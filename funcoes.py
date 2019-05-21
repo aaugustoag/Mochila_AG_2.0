@@ -144,39 +144,44 @@ def mutacao (populacao, itens, tx_mutacao):
 # fim
 
 #################################################################
-
-# funcao aptidao
-def aptidao (populacao, mochila)
-  for ind in populacao:
-    if ind[0][1] > mochila:
-      ind[0][4] = ind[0][0]-mochila
-    else:
-      ind[0][4] = 0
-    ind[0][2] = ind[0][0]*(-1)
-    ind[0][3] = ind[0][1]
-
 # baneficio do individuo
 def valor (individuo)
-  return individuo[0][0]
+  return individuo[0][0]*(-1)
 
 # peso do individuo
 def peso (individuo)
   return individuo[0][1]
 
-# selecao do pareto
-def pareto (populacao,pareto)
-  ind0 = deepcopy(populacao[0])
-  for ind in populacao[1:]:
-    if (ind[0][2] < ind0[0][2]) && (ind[0][3] < ind0[0][3]):
-       
+#max([valor(ind) for ind in populacao])
 
-
-# distancia no pareto
-def distancia (pareto)
+# funcao aptidao
+def aptidao (populacao, mochila)
   maior_v = max(populacao,key=valor)
   menor_v = min(populacao,key=valor)
   maior_p = max(populacao,key=peso)
   menor_p = min(populacao,key=peso)
+  for ind in populacao:
+    if ind[0][1] > mochila:
+      ind[0][4] = (ind[0][1]-mochila)max(populacao,key=valor)
+    else:
+      ind[0][4] = 0
+    ind[0][2] = (ind[0][0]*(-1)+maior_v)/(menor_v-maior_v)*100
+    ind[0][3] = (ind[0][1]-menor_p)/(maior_p-menor_p)*100
+
+
+# selecao do pareto
+def pareto (populacao,pareto)
+    while len(populacao) > 0
+        ind0 = deepcopy(populacao[0])
+        px = [ind0]
+        for ind in populacao[1:]:
+            if (ind[0][2] < ind0[0][2]) && (ind[0][3] < ind0[0][3]):
+                px = [ind]
+            else:
+                px.append(ind)
+        pareto.append(px)
+        for ind in pareto[i]:
+            populacao.remove[ind]
 
 
 ############################################################
