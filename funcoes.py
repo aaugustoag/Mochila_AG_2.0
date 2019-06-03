@@ -6,49 +6,19 @@ def imprime_geracao (populacao, g):
     print("Geração" + str(g) + "(" + str(len(populacao)) + "):" + str([item[0] for item in populacao]))
 # fim
 
-# imprimindo geração
+# imprimindo cruzamento
 def imprime_cruzamento (populacao, g):
     print("Cruzamento" + str(g) + "(" + str(len(populacao)) + "):" + str([item[0] for item in populacao]))
 # fim
 
-# imprimindo geração
+# imprimindo mutação
 def imprime_mutacao (populacao, g):
     print("Mutação" + str(g) + "(" + str(len(populacao)) + "):" + str([item[0] for item in populacao]))
 # fim
 
-# verificando possiveis candidatos
-def verifica_candidatos (populacao, mochila):
-    candidatos = []
-    for i, ind in enumerate(populacao):
-        if ind[0][1] <= mochila:
-            candidatos.append(deepcopy(ind[0][0]))
-    if len(candidatos) == 0:
-        return 0
-    return candidatos
-# fim
-
-# gerando individuo guloso
-def guloso (itens, mochila):
-    individuo = [[0, 0, 0]]
-    while individuo[0][1] < mochila:
-        maior = [0, 1]
-        for i, item in enumerate(itens):
-            if not (i in individuo):
-                if (item[0] / item[1] > maior[0] / maior[1]):
-                    maior = item
-                    maior_indice = i
-        individuo.append(maior_indice)
-        individuo[0][0] += maior[0]
-        individuo[0][1] += maior[1]
-    individuo[0][0] -= itens[individuo[-1]][0]
-    individuo[0][1] -= itens[individuo[-1]][1]
-    individuo.pop()
-    return individuo
-# fim
-
 # gerando individuo aleatorio
 def populacao_aleatoria (itens, mochila):
-    individuo = [[0, 0, 0]]
+    individuo = [[0, 0, 0, 0, 0]]
     item = 0
     while individuo[0][1] < mochila:
         item = randint(0, int(len(itens))-1)
@@ -61,20 +31,6 @@ def populacao_aleatoria (itens, mochila):
         individuo[0][0] -= itens[item][0]
         individuo[0][1] -= itens[item][1]
     return individuo
-# fim
-
-# escolhendo o melhor individuo (elitismo)
-def elitismo (populacao, mochila):
-    populacao_e = []
-    maior = [0, 0]
-    maior_indice = 0
-    for i, ind in enumerate(populacao):
-        if (ind[0][1] <= mochila):
-            if (ind[0][0] > maior[0]):
-                maior = ind[0]
-                maior_indice = i
-    populacao_e.append(deepcopy(populacao[maior_indice]))
-    return populacao_e
 # fim
 
 # fazendo cruzamento
@@ -90,7 +46,7 @@ def cruzamento (populacao, itens, tx_cruzamento):
             filhos = []
             filhos.append(populacao_c[-1])
             filhos.append(populacao_c[-2])
-            qde_cromossomos = 10
+            qde_cromossomos = int(len(filhos[0])/5)+1
             #print("pai" + str(filhos))
             for i in range(qde_cromossomos):
                 for cromossomo in filhos[0][1:]:
@@ -125,7 +81,7 @@ def mutacao (populacao, itens, tx_mutacao):
     for ind in populacao:
         if randint(0, 99) <= tx_mutacao * 100:
             mutante = deepcopy(ind)
-            qde_cromossomos = 10
+            qde_cromossomos = int(len(mutante)/5)+1
             cromossomo = randint(0, len(itens)-1)
             for i in range(qde_cromossomos):
                 if int((cromossomo + i * qde_cromossomos) % len(itens)) in mutante:
@@ -144,109 +100,87 @@ def mutacao (populacao, itens, tx_mutacao):
 # fim
 
 #################################################################
-# baneficio do individuo
-def valor (individuo)
-  return individuo[0][0]*(-1)
+# beneficio do individuo
+def valor (individuo):
+  return individuo[0][0]
 
 # peso do individuo
-def peso (individuo)
+def peso (individuo):
   return individuo[0][1]
 
-#max([valor(ind) for ind in populacao])
+# aptidao beneficio do individuo
+def apt_valor (individuo):
+  return individuo[0][2]
+
+# aptidao peso do individuo
+def apt_peso (individuo):
+  return individuo[0][3]
+
+# aptidao peso do individuo
+def dist (individuo):
+  return individuo[0][4]
 
 # funcao aptidao
-def aptidao (populacao, mochila)
-  maior_v = max(populacao,key=valor)
-  menor_v = min(populacao,key=valor)
-  maior_p = max(populacao,key=peso)
-  menor_p = min(populacao,key=peso)
-  for ind in populacao:
-    if ind[0][1] > mochila:
-      ind[0][4] = (ind[0][1]-mochila)max(populacao,key=valor)
-    else:
-      ind[0][4] = 0
-    ind[0][2] = (ind[0][0]*(-1)+maior_v)/(menor_v-maior_v)*100
-    ind[0][3] = (ind[0][1]-menor_p)/(maior_p-menor_p)*100
-
+def aptidao (populacao, mochila):
+    maior_v = max(populacao,key=valor)[0][0]
+    maior_p = max(populacao,key=peso)[0][1]
+    menor_p = min(populacao,key=peso)[0][1]
+    for ind in populacao:
+        ind[0][2] = int((ind[0][0]*(-1) + maior_v) / maior_v * 1000)
+        ind[0][3] = int((ind[0][1] - menor_p) / (menor_p + 1) * 1000)
+        if ind[0][1] > mochila:
+            ind[0][2] += int((ind[0][1] - mochila) / maior_p * 1000)
+            ind[0][3] += int((ind[0][1] - mochila) / maior_p * 1000)
+    return populacao
 
 # selecao do pareto
-def pareto (populacao,pareto)
-    while len(populacao) > 0
-        ind0 = deepcopy(populacao[0])
-        px = [ind0]
-        for ind in populacao[1:]:
-            if (ind[0][2] < ind0[0][2]) && (ind[0][3] < ind0[0][3]):
-                px = [ind]
-            else:
-                px.append(ind)
-        pareto.append(px)
-        for ind in pareto[i]:
-            populacao.remove[ind]
-
-
-############################################################
-
-
-
-
-
-# fazendo competicao roleta x1
-def selecao (populacao, mochila, tam_pop):
-    populacao_s = []
-    populacao_aux = []
-    valor_acumulado = 0
-    maior_v = 0
-    maior_p = 0
-
+def pareto (populacao,mochila):
+    populacao = aptidao(populacao, mochila)
+    pareto = []
+    i=0
+    populacao_p = []
     for ind in populacao:
-        ind[0][2] = 0
-        if ind[0][0] > maior_v:
-            maior_v = ind[0][0]
-        menor_v = maior_v
-        if ind[0][0] < menor_v:
-            menor_v = ind[0][0]
-        if ind[0][1] > maior_p:
-            maior_p = ind[0][1]
+        ind[1:] = sorted(ind[1:])
+        if not(ind in populacao_p):
+            populacao_p.append(ind)
+    while len(populacao_p) > 0:
+        i+=1
+        px = []
+        for ind in populacao_p:
+            px.append(ind)
+            for ind0 in px:
+                if (ind[0][2] < ind0[0][2]) and (ind[0][3] < ind0[0][3]):
+                    px.remove(ind0)
+                if (ind[0][2] > ind0[0][2]) and (ind[0][3] > ind0[0][3] and ind in px):
+                    px.remove(ind)
+        pareto.append(px)
+        for ind in px:
+            populacao_p.remove(ind)
+        #print("\nPareto"+str(i)+":\n"+str(px))
+    return pareto
 
-    populacao = (sorted(populacao, reverse=True))
+def distancia (front):
+    front = sorted(front,key=apt_peso)
+    front = sorted(front,key=apt_valor)
+    front[0][0][4] = float("inf")
+    front[-1][0][4] = float("inf")
+    #print(len(front),front[1:-1])
+    for i, ind in enumerate(front[1:-1]):
+        ind[0][4] = (front[i-1][0][2] - front[i+1][0][2])**2 + (front[i-1][0][3] - front[i+1][0][3])**2
+        #if dist == 0:
+            #front.remove(ind)
+        #print(front[i-1],ind,front[i+1])
+    return front
 
-    #funcao aptidao
-    for i,ind in enumerate(populacao):
-        if i > 0:
-            if sorted(populacao[i][1:]) != sorted(populacao[i-1][1:]):
-                if ind[0][1] > mochila:
-                    ind[0][2] = int(menor_v * ind[0][0] / maior_v / (ind[0][1] - mochila +1) + menor_v/10)
-                    #print(ind, menor_v, int(menor_v * ind[0][0] / maior_v / (ind[0][1] - mochila) + menor_v/10), valor_acumulado)
-                else:
-                    ind[0][2] = int(ind[0][0] + menor_v/10)
-                    #print(ind, menor_v, int(ind[0][0] + menor_v/10), valor_acumulado)
-                valor_acumulado += ind[0][2]
-                ind[0][2] = valor_acumulado
-                populacao_aux.append(deepcopy(ind))
-        else:
-            if ind[0][1] > mochila:
-                ind[0][2] = int(menor_v * ind[0][0] / maior_v / (ind[0][1] - mochila +1) + menor_v/10)
-                #print(ind, menor_v, int(menor_v * ind[0][0] / maior_v / (ind[0][1] - mochila) + menor_v/10), valor_acumulado)
-            else:
-                ind[0][2] = int(ind[0][0] + menor_v/10)
-                #print(ind, menor_v, int(ind[0][0] + menor_v/10), valor_acumulado)
-            valor_acumulado += ind[0][2]
-            ind[0][2] = valor_acumulado
-            populacao_aux.append(deepcopy(ind))
-
-    #print("aux" + str(populacao_aux))
-
-    #selecao por roleta de 1
-    vitorioso = 0
-    while len(populacao_s) < tam_pop-1:
-        vitorioso = (vitorioso + randint(0, int(valor_acumulado / 2))) % valor_acumulado
-        for ind in populacao:
-            if ind[0][2] >= vitorioso:
-                populacao_s.append(ind)
+def selecao (pareto, tam_pop):
+    populacao = []
+    for front in pareto:
+        front = distancia(front)
+        front = sorted(front,key=dist,reverse=True)
+        for ind in front:
+            if len(populacao) >= tam_pop:
                 break
-
-    while len(populacao_s) > tam_pop-1:
-        populacao_s.pop()
-
-    return populacao_s
-# fim
+            populacao.append(ind)
+        if len(populacao) >= tam_pop:
+            break
+    return populacao
