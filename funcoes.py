@@ -40,8 +40,8 @@ def verifica_candidatos (populacao, mochila):
             candidatos.append(deepcopy(ind[0][1]))
     if len(candidatos) == 0:
         return 0
-    while len(candidatos) < len(populacao):
-        candidatos.append(0)
+    #while len(candidatos) < len(populacao):
+        #candidatos.append(0)
     return candidatos
 # fim
 

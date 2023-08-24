@@ -5,17 +5,20 @@ import math
 import funcoes
 from copy import deepcopy
 
-#        0     1     2     3     4     5     6     7     8     9     10    11
-#itens2=[[3,5],[7,2],[4,5],[6,8],[3,6],[6,6],[7,1],[1,7],[1,1],[3,3],[3,2],[4,1]]
+# parametros
+tam_pop = 20
+qde_geracoes = 50
+tx_mutacao = 0.1
+tx_cruzamento = 0.7
+n_aplicacoes = 4
+# fim
 
-
+#seleciona instancia
 #instancia = input('Selecione a instancia:\n1- 40 itens:\n2- 100 itens:\n3- 10.000 itens:\n4- 10.000-2 itens:\n5- 11.000 itens:\n6- 100.000 iten:\n')
-
 #instancia = int(instancia)
+instancia = 3
 
 for i in range(1):
-
-    instancia = 3
 
     if instancia == 1:
         print("Arquivo KNAPDATA40.TXT selecionado")
@@ -41,16 +44,8 @@ for i in range(1):
 
     mochila, itens = funcoes.importa_txt(arq)
     arq.close()
+    #fim
 
-    tam_pop=10
-    qde_geracoes=50
-    tx_mutacao=0.1
-    tx_cruzamento=0.7
-    n_aplicacoes = 4
-
-    lista_convergencias = []
-    lista_valor_minimo = []
-    dispersao = []
     df_populacao = pd.DataFrame(columns = ["Aplicação", "Geração","Aptidão", "Indivíduo"])
 
     for t in range(n_aplicacoes):
@@ -77,14 +72,14 @@ for i in range(1):
         df_populacao = df_populacao._append({"Aplicação": t + 1,
                                              "Geração": 0,
                                              "Aptidão": melhor_ind,
-                                             "indivíduo": "População"},
+                                             "Indivíduo": "Melhor Indivíduo"},
                                             ignore_index=True)
 
         pior_ind = (min(funcoes.verifica_candidatos(populacao, mochila)))
         df_populacao = df_populacao._append({"Aplicação": t + 1,
                                              "Geração": 0,
                                              "Aptidão": pior_ind,
-                                             "indivíduo": "População"},
+                                             "Indivíduo": "Pior Indivíduo"},
                                             ignore_index=True)
 
         populacao_valida = (funcoes.verifica_candidatos(populacao, mochila))
@@ -112,27 +107,27 @@ for i in range(1):
             #print("Melhor individuo" + str(g+1) + ": " + str(funcoes.elitismo(populacao, mochila)[0][0]))
 
             # armazenando possiveis candidatos
-            melhor_ind = (max(funcoes.verifica_candidatos(populacao, mochila)))
-            df_populacao = df_populacao._append({"Aplicação": t + 1,
-                                                 "Geração": g + 1,
-                                                 "Aptidão": melhor_ind,
-                                                 "indivíduo": "População"},
-                                                ignore_index=True)
-
-            pior_ind = (min(funcoes.verifica_candidatos(populacao, mochila)))
-            df_populacao = df_populacao._append({"Aplicação": t + 1,
-                                                 "Geração": g + 1,
-                                                 "Aptidão": pior_ind,
-                                                 "indivíduo": "População"},
-                                                ignore_index=True)
-
             populacao_valida = (funcoes.verifica_candidatos(populacao, mochila))
             for ind in populacao_valida:
                 df_populacao = df_populacao._append({"Aplicação": t + 1,
                                                      "Geração": g+1,
                                                      "Aptidão": ind,
-                                                     "indivíduo": "População"},
+                                                     "Indivíduo": "População"},
                                                     ignore_index=True)
+
+            melhor_ind = (max(populacao_valida))
+            df_populacao = df_populacao._append({"Aplicação": t + 1,
+                                                 "Geração": g + 1,
+                                                 "Aptidão": melhor_ind,
+                                                 "Indivíduo": "Melhor Indivíduo"},
+                                                ignore_index=True)
+
+            pior_ind = (min(populacao_valida))
+            df_populacao = df_populacao._append({"Aplicação": t + 1,
+                                                 "Geração": g + 1,
+                                                 "Aptidão": pior_ind,
+                                                 "Indivíduo": "Pior Indivíduo"},
+                                                ignore_index=True)
 
             #funcoes.imprime_geracao(populacao, g+1)
             # fim
@@ -143,9 +138,10 @@ for i in range(1):
         print("Melhor Solução " + str(t+1) + ":", melhor_solucao[0][0][1], "\nItens:", melhor_solucao[0][1:])
         # fim
 
+# print("\n", df_populacao)
 # imprime gráficos
 sns.relplot(df_populacao, x="Geração", y="Aptidão",
-            col="Aplicação", col_wrap=math.ceil(n_aplicacoes/3),
+            col="Aplicação", col_wrap=math.floor(n_aplicacoes/3+1),
             hue="Indivíduo", kind="line")
 plt.show()
 # fim
