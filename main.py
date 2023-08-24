@@ -8,22 +8,28 @@ from copy import deepcopy
 # parametros
 tam_pop = 20
 qde_geracoes = 50
-
 tx_mutacao = 0.1
 tx_cruzamento = 0.7
 n_aplicacoes = 4
 # fim
 
-#seleciona instancia
-#instancia = input('Selecione a instancia:\n1- 40 itens:\n2- 100 itens:\n3- 10.000 itens:\n4- 10.000-2 itens:\n5- 11.000 itens:\n6- 100.000 iten:\n')
-#instancia = int(instancia)
+# seleciona instancia
+# instancia = input('Selecione a instancia:
+# \n1- 40 itens:
+# \n2- 100 itens:
+# \n3- 10.000 itens:
+# \n4- 10.000-2 itens:
+# \n5- 11.000 itens:
+# \n6- 100.000 iten:\n')
+# instancia = int(instancia)
 instancia = 3
+
+df_populacao = pd.DataFrame(columns=["Aplicação", "Geração", "Aptidão", "Indivíduo"])
 
 for i in range(1):
 
     if instancia == 1:
         print("Arquivo KNAPDATA40.TXT selecionado")
-        #/home/alexandreaag/PycharmProjects/Mochila_AG/Principal/
         arq = open('KNAPDATA40.TXT', 'r')
     elif instancia == 2:
         print("Arquivo KNAPDATA100.TXT selecionado")
@@ -45,29 +51,27 @@ for i in range(1):
 
     mochila, itens = funcoes.importa_txt(arq)
     arq.close()
-    #fim
-
-    df_populacao = pd.DataFrame(columns = ["Aplicação", "Geração","Aptidão", "Indivíduo"])
+    # fim
 
     for t in range(n_aplicacoes):
         populacao_final = {}
-        populacao=[]
-        individuo=[[0,0]]
-        convergencia=[]
-        valor_minimo=[]
-        populacao_valida=[]
+        populacao = []
+        individuo = [[0, 0]]
+        convergencia = []
+        valor_minimo = []
+        populacao_valida = []
 
-        #gerando melhor individuo com guloso
-        populacao.append(funcoes.guloso(itens,mochila))
-        #fim
+        # gerando melhor individuo com guloso
+        populacao.append(funcoes.guloso(itens, mochila))
+        # fim
 
-        #gerando a populacao inicial
+        # gerando a populacao inicial
         while len(populacao) < tam_pop:
-            populacao.append(funcoes.populacao_aleatoria(itens,mochila))
-        #fim
+            populacao.append(funcoes.populacao_aleatoria(itens, mochila))
+        # fim
 
-        print("\nAplicação ", (t+1) )
-        #funcoes.imprime_geracao(populacao, 0)
+        print("\nAplicação ", (t+1))
+        # funcoes.imprime_geracao(populacao, 0)
 
         melhor_ind = (max(funcoes.verifica_candidatos(populacao, mochila)))
         df_populacao = df_populacao._append({"Aplicação": t + 1,
@@ -85,27 +89,27 @@ for i in range(1):
 
         populacao_valida = (funcoes.verifica_candidatos(populacao, mochila))
         for ind in populacao_valida:
-            df_populacao = df_populacao._append({"Aplicação":t+1,
-                                                 "Geração":0,
-                                                 "Aptidão":ind,
-                                                 "Indivíduo":"População"},
+            df_populacao = df_populacao._append({"Aplicação": t+1,
+                                                 "Geração": 0,
+                                                 "Aptidão": ind,
+                                                 "Indivíduo": "População"},
                                                 ignore_index=True)
 
         for g in range(qde_geracoes):
 
-            populacao_e=funcoes.elitismo(populacao, mochila)
-            populacao_c=funcoes.cruzamento(populacao,itens,tx_cruzamento)
-            populacao=deepcopy(populacao_e)+deepcopy(populacao_c)
-            #funcoes.imprime_cruzamento(populacao_c, g+1)
+            populacao_e = funcoes.elitismo(populacao, mochila)
+            populacao_c = funcoes.cruzamento(populacao, itens, tx_cruzamento)
+            populacao = deepcopy(populacao_e) + deepcopy(populacao_c)
+            # funcoes.imprime_cruzamento(populacao_c, g+1)
 
-            populacao_m=funcoes.mutacao(populacao,itens,tx_mutacao)
-            populacao=deepcopy(populacao_e)+deepcopy(populacao_m)+deepcopy(populacao_c)
-            #funcoes.imprime_mutacao(populacao_m, g+1)
+            populacao_m = funcoes.mutacao(populacao, itens, tx_mutacao)
+            populacao = deepcopy(populacao_e) + deepcopy(populacao_m) + deepcopy(populacao_c)
+            # funcoes.imprime_mutacao(populacao_m, g+1)
 
-            populacao_s=funcoes.selecao(populacao,mochila,tam_pop)
-            populacao=deepcopy(populacao_e)+deepcopy(populacao_s)
-            #funcoes.imprime_geracao(populacao, g+1)
-            #print("Melhor individuo" + str(g+1) + ": " + str(funcoes.elitismo(populacao, mochila)[0][0]))
+            populacao_s = funcoes.selecao(populacao, mochila, tam_pop)
+            populacao = deepcopy(populacao_e) + deepcopy(populacao_s)
+            # funcoes.imprime_geracao(populacao, g+1)
+            # print("Melhor individuo" + str(g+1) + ": " + str(funcoes.elitismo(populacao, mochila)[0][0]))
 
             # armazenando possiveis candidatos
             populacao_valida = (funcoes.verifica_candidatos(populacao, mochila))
@@ -130,7 +134,7 @@ for i in range(1):
                                                  "Indivíduo": "Pior Indivíduo"},
                                                 ignore_index=True)
 
-            #funcoes.imprime_geracao(populacao, g+1)
+            # funcoes.imprime_geracao(populacao, g+1)
             # fim
 
         # imprime resultado
