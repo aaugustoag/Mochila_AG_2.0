@@ -1,3 +1,6 @@
-# Mochila_AG_2.0
-Mochila AG 2 objetivos<br>
-<red>Thisaff </p>
+## Problema da Mochila em AG
+
+<div>
+  <img align="center" src="https://img.shields.io/badge/Python-FF8C00?style=for-the-badge&logo=python&logoColor=white"><br>
+  <img src="https://img.shields.io/badge/Outros-green">
+</div>
