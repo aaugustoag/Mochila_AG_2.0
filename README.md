@@ -2,5 +2,5 @@
 
 <div>
   <img align="center" src="https://img.shields.io/badge/Python-FF8C00?style=for-the-badge&logo=python&logoColor=white"><br>
-  <img src="https://img.shields.io/badge/Outros-green">
+  <img src="https://img.shields.io/badge/Programação%20Evolutiva-purple">
 </div>
