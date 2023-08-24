@@ -8,6 +8,7 @@ from copy import deepcopy
 # parametros
 tam_pop = 20
 qde_geracoes = 50
+
 tx_mutacao = 0.1
 tx_cruzamento = 0.7
 n_aplicacoes = 4
